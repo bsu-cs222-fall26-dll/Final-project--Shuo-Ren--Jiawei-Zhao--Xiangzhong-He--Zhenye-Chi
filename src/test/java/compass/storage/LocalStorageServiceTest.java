@@ -151,4 +151,38 @@ public class LocalStorageServiceTest {
         );
     }
 
+    @Test
+    void keepsOldDataWhenBackupFails() throws IOException {
+        Path file = tempDir.resolve("planner.json");
+        LocalStorageService storage = new LocalStorageService(file);
+
+        AppData original = new AppData(List.of(), Map.of());
+        storage.saveAllData(original);
+
+        String oldJson = java.nio.file.Files.readString(file);
+
+        Path backup = tempDir.resolve("planner.json.bak");
+        java.nio.file.Files.createDirectories(backup);
+        java.nio.file.Files.writeString(
+                backup.resolve("keep.txt"), "backup"
+        );
+
+        AppData updated = new AppData(
+                List.of(new Assignment(
+                        2L, "New Project", "CS222", null
+                )),
+                Map.of()
+        );
+
+        assertThrows(
+                IOException.class,
+                () -> storage.saveAllData(updated)
+        );
+
+        assertEquals(
+                oldJson,
+                java.nio.file.Files.readString(file)
+        );
+    }
+
 }
