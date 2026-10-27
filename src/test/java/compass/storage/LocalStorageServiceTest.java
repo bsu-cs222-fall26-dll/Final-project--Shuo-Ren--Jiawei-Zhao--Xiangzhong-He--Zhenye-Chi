@@ -84,4 +84,40 @@ public class LocalStorageServiceTest {
         assertEquals("Finish the code", savedStep.getText());
         assertTrue(savedStep.isCompleted());
     }
+
+    @Test
+    void rejectsCorruptedFileWithoutDeletingIt() throws IOException {
+        Path file = tempDir.resolve("corrupted.json");
+        String invalidJson = "{ invalid json";
+
+        java.nio.file.Files.writeString(file, invalidJson);
+
+        LocalStorageService storage = new LocalStorageService(file);
+
+        assertThrows(IOException.class, storage::loadAllData);
+
+        assertEquals(
+                invalidJson,
+                java.nio.file.Files.readString(file)
+        );
+    }
+
+    @Test
+    void rejectsMissingSaveFile() {
+        Path file = tempDir.resolve("missing.json");
+        LocalStorageService storage = new LocalStorageService(file);
+
+        assertThrows(IOException.class, storage::loadAllData);
+    }
+
+    @Test
+    void rejectsEmptySaveFile() throws IOException {
+        Path file = tempDir.resolve("empty.json");
+        java.nio.file.Files.writeString(file, "");
+
+        LocalStorageService storage = new LocalStorageService(file);
+
+        assertThrows(IOException.class, storage::loadAllData);
+    }
+
 }
