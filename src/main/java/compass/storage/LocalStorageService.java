@@ -56,20 +56,46 @@ public class LocalStorageService {
         String json = gson.toJson(data);
         Path target = filePath.toAbsolutePath();
         Path parent = target.getParent();
+
         Files.createDirectories(parent);
 
-        Path tempFile = Files.createTempFile(parent, "coursecompass-", ".tmp");
+        Path tempFile = Files.createTempFile(
+                parent, "coursecompass-", ".tmp"
+        );
 
         try {
-            Files.writeString(tempFile, json, StandardCharsets.UTF_8);
+            Files.writeString(
+                    tempFile,
+                    json,
+                    StandardCharsets.UTF_8
+            );
+
+            // Back up the existing data before replacing it.
+            if (Files.exists(target)) {
+                Path backup = target.resolveSibling(
+                        target.getFileName().toString() + ".bak"
+                );
+
+                Files.copy(
+                        target,
+                        backup,
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+            }
 
             try {
-                Files.move(tempFile, target,
+                Files.move(
+                        tempFile,
+                        target,
                         StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE);
+                        StandardCopyOption.ATOMIC_MOVE
+                );
             } catch (AtomicMoveNotSupportedException e) {
-                Files.move(tempFile, target,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.move(
+                        tempFile,
+                        target,
+                        StandardCopyOption.REPLACE_EXISTING
+                );
             }
         } finally {
             Files.deleteIfExists(tempFile);
@@ -92,7 +118,7 @@ public class LocalStorageService {
             }
 
             return data;
-        } catch (JsonParseException | IllegalStateException e) {
+        } catch (JsonParseException e) {
             throw new IOException("Could not read saved data", e);
         }
     }

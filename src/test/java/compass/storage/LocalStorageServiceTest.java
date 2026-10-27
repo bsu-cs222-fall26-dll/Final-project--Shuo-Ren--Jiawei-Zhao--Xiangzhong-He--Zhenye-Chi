@@ -120,4 +120,35 @@ public class LocalStorageServiceTest {
         assertThrows(IOException.class, storage::loadAllData);
     }
 
+    @Test
+    void createsBackupBeforeReplacingSavedData() throws IOException {
+        Path file = tempDir.resolve("planner.json");
+        LocalStorageService storage = new LocalStorageService(file);
+
+        AppData first = new AppData(List.of(), Map.of());
+        storage.saveAllData(first);
+
+        String originalJson = java.nio.file.Files.readString(file);
+
+        AppData second = new AppData(
+                List.of(new Assignment(
+                        1L,
+                        "CS222 Project",
+                        "CS222",
+                        null
+                )),
+                Map.of()
+        );
+
+        storage.saveAllData(second);
+
+        Path backup = file.resolveSibling("planner.json.bak");
+
+        assertTrue(java.nio.file.Files.exists(backup));
+        assertEquals(
+                originalJson,
+                java.nio.file.Files.readString(backup)
+        );
+    }
+
 }
