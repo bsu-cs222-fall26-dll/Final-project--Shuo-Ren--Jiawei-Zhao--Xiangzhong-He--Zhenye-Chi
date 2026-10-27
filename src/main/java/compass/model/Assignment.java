@@ -35,6 +35,17 @@ public final class Assignment {
             AssignmentSource source,
             Long canvasAssignmentId
     ) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Assignment name must not be blank."
+            );
+        }
+
+        if (courseName == null || courseName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Course name must not be blank."
+            );
+        }
         this.id = id;
         this.name = name;
         this.courseName = courseName;

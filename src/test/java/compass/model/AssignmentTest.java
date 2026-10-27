@@ -1,4 +1,5 @@
 package compass.model;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 
@@ -67,5 +68,34 @@ class AssignmentTest {
                 assignment.getCanvasAssignmentId()
         );
         assertNull(assignment.getDueDate());
+    }
+    @Test
+    void rejectsBlankAssignmentNames() {
+        for (String name : new String[]{null, "", " ", "\t"}) {
+            IllegalArgumentException error = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new Assignment(105L, name, "CS222", null)
+            );
+
+            assertEquals(
+                    "Assignment name must not be blank.",
+                    error.getMessage()
+            );
+        }
+    }
+
+    @Test
+    void rejectsBlankCourseNames() {
+        for (String courseName : new String[]{null, "", " ", "\t"}) {
+            IllegalArgumentException error = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new Assignment(106L, "Lab 2", courseName, null)
+            );
+
+            assertEquals(
+                    "Course name must not be blank.",
+                    error.getMessage()
+            );
+        }
     }
 }
