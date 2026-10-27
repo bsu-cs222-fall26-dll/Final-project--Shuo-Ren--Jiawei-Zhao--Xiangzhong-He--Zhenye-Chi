@@ -8,6 +8,8 @@ public final class Assignment {
     private final String name;
     private final String courseName;
     private final LocalDateTime dueDate;
+    private final AssignmentSource source;
+    private final Long canvasAssignmentId;
 
     public Assignment(
             long id,
@@ -15,10 +17,30 @@ public final class Assignment {
             String courseName,
             LocalDateTime dueDate
     ) {
+        this(
+                id,
+                name,
+                courseName,
+                dueDate,
+                AssignmentSource.MANUAL,
+                null
+        );
+    }
+
+    public Assignment(
+            long id,
+            String name,
+            String courseName,
+            LocalDateTime dueDate,
+            AssignmentSource source,
+            Long canvasAssignmentId
+    ) {
         this.id = id;
         this.name = name;
         this.courseName = courseName;
         this.dueDate = dueDate;
+        this.source = source;
+        this.canvasAssignmentId = canvasAssignmentId;
     }
 
     public long getId() {
@@ -35,5 +57,13 @@ public final class Assignment {
 
     public LocalDateTime getDueDate() {
         return dueDate;
+    }
+
+    public AssignmentSource getSource() {
+        return source;
+    }
+
+    public Long getCanvasAssignmentId() {
+        return canvasAssignmentId;
     }
 }

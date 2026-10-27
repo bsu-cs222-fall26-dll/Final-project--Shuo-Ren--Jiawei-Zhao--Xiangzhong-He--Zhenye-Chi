@@ -36,4 +36,36 @@ class AssignmentTest {
 
         assertNull(assignment.getDueDate());
     }
+    @Test
+    void manualAssignmentHasManualSourceAndNoCanvasId() {
+        Assignment assignment = new Assignment(
+                103L,
+                "Practice",
+                "CS222",
+                null
+        );
+
+        assertEquals(AssignmentSource.MANUAL, assignment.getSource());
+        assertNull(assignment.getCanvasAssignmentId());
+    }
+
+    @Test
+    void canvasAssignmentPreservesSourceAndCanvasId() {
+        Assignment assignment = new Assignment(
+                104L,
+                "Canvas Reading",
+                "CS222",
+                null,
+                AssignmentSource.CANVAS,
+                9001L
+        );
+
+        assertEquals(104L, assignment.getId());
+        assertEquals(AssignmentSource.CANVAS, assignment.getSource());
+        assertEquals(
+                Long.valueOf(9001L),
+                assignment.getCanvasAssignmentId()
+        );
+        assertNull(assignment.getDueDate());
+    }
 }
