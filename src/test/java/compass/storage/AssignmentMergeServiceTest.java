@@ -220,4 +220,55 @@ public class AssignmentMergeServiceTest {
         assertFalse(result.getStepsByAssignment().containsKey(2L));
     }
 
+    @Test
+    void savesAndReloadsMergedCanvasAssignments(
+            @org.junit.jupiter.api.io.TempDir java.nio.file.Path tempDir
+    ) throws java.io.IOException {
+
+        Assignment manual = new Assignment(
+                1L, "My Homework", "CS222", null
+        );
+
+        StudyStep step = new StudyStep(
+                1L, 1L, "Finish homework"
+        );
+        step.setCompleted(true);
+
+        AppData saved = new AppData(
+                List.of(manual),
+                Map.of(1L, List.of(step))
+        );
+
+        Assignment canvas = new Assignment(
+                99L, "Canvas Project", "CS222", null,
+                AssignmentSource.CANVAS, 500L
+        );
+
+        AssignmentMergeService merger =
+                new AssignmentMergeService();
+
+        AppData merged = merger.mergeImportedAssignments(
+                saved, List.of(canvas)
+        );
+
+        LocalStorageService storage =
+                new LocalStorageService(tempDir.resolve("data.json"));
+
+        storage.saveAllData(merged);
+        AppData loaded = storage.loadAllData();
+
+        assertEquals(2, loaded.getAssignments().size());
+
+        assertTrue(loaded.getAssignments().stream()
+                .anyMatch(a -> Long.valueOf(500L)
+                        .equals(a.getCanvasAssignmentId())));
+
+        assertEquals("My Homework",
+                loaded.getAssignments().get(0).getName());
+
+        assertTrue(loaded.getStepsByAssignment()
+                .get(1L).get(0).isCompleted());
+    }
+
+
 }
