@@ -241,4 +241,45 @@ public class LocalStorageServiceTest {
         );
     }
 
+    @Test
+    void restoresDeletedAssignmentFromBackup(
+            @TempDir Path tempDir
+    ) throws IOException {
+
+        Path file = tempDir.resolve("data.json");
+        LocalStorageService storage =
+                new LocalStorageService(file);
+
+        Assignment first = new Assignment(
+                1L, "Java Homework", "CS222", null
+        );
+
+        Assignment second = new Assignment(
+                2L, "Final Project", "CS222", null
+        );
+
+        storage.saveAllData(new AppData(
+                List.of(first, second),
+                Map.of()
+        ));
+
+        storage.saveAllData(new AppData(
+                List.of(first),
+                Map.of()
+        ));
+
+        assertEquals(1,
+                storage.loadAllData().getAssignments().size());
+
+        storage.restoreFromBackup();
+
+        AppData restored = storage.loadAllData();
+
+        assertEquals(2, restored.getAssignments().size());
+
+        assertTrue(restored.getAssignments().stream()
+                .anyMatch(a -> a.getId() == 2L
+                        && a.getName().equals("Final Project")));
+    }
+
 }
