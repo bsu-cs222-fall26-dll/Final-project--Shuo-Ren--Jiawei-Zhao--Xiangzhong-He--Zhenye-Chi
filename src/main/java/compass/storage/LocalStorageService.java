@@ -7,10 +7,10 @@ import com.google.gson.JsonParseException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.time.LocalDateTime;
 
 public class LocalStorageService {
@@ -65,50 +65,73 @@ public class LocalStorageService {
 
         try {
             Files.writeString(
-                    tempFile,
-                    json,
-                    StandardCharsets.UTF_8
+                    tempFile, json, StandardCharsets.UTF_8
             );
 
-            // Back up the existing data before replacing it.
             if (Files.exists(target)) {
-                Path backup = target.resolveSibling(
-                        target.getFileName().toString() + ".bak"
-                );
-
                 Files.copy(
                         target,
-                        backup,
+                        getBackupPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
             }
 
-            try {
-                Files.move(
-                        tempFile,
-                        target,
-                        StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE
-                );
-            } catch (AtomicMoveNotSupportedException e) {
-                Files.move(
-                        tempFile,
-                        target,
-                        StandardCopyOption.REPLACE_EXISTING
-                );
-            }
+            replaceFile(tempFile, target);
         } finally {
             Files.deleteIfExists(tempFile);
         }
     }
 
     public AppData loadAllData() throws IOException {
-        if (Files.notExists(filePath)) {
+        return readData(filePath);
+    }
+
+    public void restoreFromBackup() throws IOException {
+        Path backup = getBackupPath();
+
+        // Check the backup before replacing the current file.
+        readData(backup);
+
+        Path target = filePath.toAbsolutePath();
+        Path parent = target.getParent();
+
+        Files.createDirectories(parent);
+
+        Path tempFile = Files.createTempFile(
+                parent, "coursecompass-restore-", ".tmp"
+        );
+
+        try {
+            Files.copy(
+                    backup,
+                    tempFile,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
+            replaceFile(tempFile, target);
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    private Path getBackupPath() {
+        Path target = filePath.toAbsolutePath();
+
+        return target.resolveSibling(
+                target.getFileName().toString() + ".bak"
+        );
+    }
+
+    private AppData readData(Path path) throws IOException {
+        if (!Files.isRegularFile(path)) {
             throw new IOException("No saved data found");
         }
 
         try {
-            String json = loadText();
+            String json = Files.readString(
+                    path, StandardCharsets.UTF_8
+            );
+
             AppData data = gson.fromJson(json, AppData.class);
 
             if (data == null
@@ -118,8 +141,26 @@ public class LocalStorageService {
             }
 
             return data;
-        } catch (JsonParseException e) {
+        } catch (JsonParseException | IllegalStateException e) {
             throw new IOException("Could not read saved data", e);
+        }
+    }
+
+    private void replaceFile(Path source, Path target)
+            throws IOException {
+        try {
+            Files.move(
+                    source,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE
+            );
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(
+                    source,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
         }
     }
 }

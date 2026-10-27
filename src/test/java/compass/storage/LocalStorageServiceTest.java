@@ -185,4 +185,31 @@ public class LocalStorageServiceTest {
         );
     }
 
+    @Test
+    void restoresDataFromBackup() throws IOException {
+        Path file = tempDir.resolve("planner.json");
+        LocalStorageService storage = new LocalStorageService(file);
+
+        AppData original = new AppData(
+                List.of(new Assignment(
+                        5L, "Java Project", "CS222", null
+                )),
+                Map.of()
+        );
+
+        storage.saveAllData(original);
+        storage.saveAllData(new AppData(List.of(), Map.of()));
+
+        java.nio.file.Files.writeString(file, "{ broken json");
+
+        storage.restoreFromBackup();
+
+        AppData restored = storage.loadAllData();
+
+        assertEquals(1, restored.getAssignments().size());
+        assertEquals(5L, restored.getAssignments().get(0).getId());
+        assertEquals("Java Project",
+                restored.getAssignments().get(0).getName());
+    }
+
 }
