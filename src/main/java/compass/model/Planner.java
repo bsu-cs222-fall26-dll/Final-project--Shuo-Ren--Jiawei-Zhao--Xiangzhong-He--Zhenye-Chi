@@ -96,4 +96,14 @@ public final class Planner {
 
         step.setCompleted(completed);
     }
+
+    public void deleteAssignment(long assignmentId) {
+        if (assignments.remove(assignmentId) == null) {
+            throw new IllegalArgumentException(
+                    "Assignment not found: " + assignmentId
+            );
+        }
+
+        stepsByAssignment.remove(assignmentId);
+    }
 }
