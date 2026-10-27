@@ -1,6 +1,7 @@
 package compass.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,10 @@ public final class Planner {
 
     private final Map<Long, Assignment> assignments = new HashMap<>();
     private long nextAssignmentId = 1L;
+
+    private final Map<Long, List<StudyStep>> stepsByAssignment =
+            new HashMap<>();
+    private long nextStudyStepId = 1L;
 
     public Assignment createManualAssignment(
             String name,
@@ -35,5 +40,44 @@ public final class Planner {
                         Comparator.nullsLast(Comparator.naturalOrder())
                 ).thenComparingLong(Assignment::getId))
                 .toList();
+    }
+
+    public StudyStep addStudyStep(long assignmentId, String text) {
+        if (!assignments.containsKey(assignmentId)) {
+            throw new IllegalArgumentException(
+                    "Assignment not found: " + assignmentId
+            );
+        }
+
+        StudyStep step = new StudyStep(
+                nextStudyStepId,
+                assignmentId,
+                text
+        );
+
+        stepsByAssignment
+                .computeIfAbsent(assignmentId, ignored -> new ArrayList<>())
+                .add(step);
+
+        nextStudyStepId++;
+        return step;
+    }
+
+    public List<StudyStep> getStepsForAssignment(long assignmentId) {
+        return List.copyOf(
+                stepsByAssignment.getOrDefault(assignmentId, List.of())
+        );
+    }
+
+    public void deleteStudyStep(long assignmentId, long stepId) {
+        List<StudyStep> steps = stepsByAssignment.get(assignmentId);
+
+        if (steps == null
+                || !steps.removeIf(step -> step.getId() == stepId)) {
+            throw new IllegalArgumentException(
+                    "Study step not found for assignment "
+                            + assignmentId + ": " + stepId
+            );
+        }
     }
 }
