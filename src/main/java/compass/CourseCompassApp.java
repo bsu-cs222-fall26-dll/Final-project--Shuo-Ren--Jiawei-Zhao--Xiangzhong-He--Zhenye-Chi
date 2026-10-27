@@ -1,9 +1,22 @@
 package compass;
 
-import javax.swing.*;
+import compass.model.Assignment;
+import compass.model.Planner;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.LocalDateTime;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 public class CourseCompassApp {
+
+    private static final Planner planner = new Planner();
+
+    private static JTable assignmentTable;
+    private static DefaultTableModel assignmentTableModel;
+    private static JLabel statusLabel;
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(CourseCompassApp::buildMainWindow);
     }
@@ -29,16 +42,50 @@ public class CourseCompassApp {
         topBarPanel.add(searchInput);
         rootPanel.add(topBarPanel, BorderLayout.NORTH);
 
-        JTable assignmentTable = new JTable();
+        assignmentTableModel = new DefaultTableModel(new Object[]{"ID","Name","Course","Due Date"},0);
+        assignmentTable = new JTable(assignmentTableModel);
         JScrollPane tableScrollPane = new JScrollPane(assignmentTable);
         rootPanel.add(tableScrollPane, BorderLayout.CENTER);
 
         JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel statusLabel = new JLabel("Ready");
+        statusLabel = new JLabel("Ready");
         statusBar.add(statusLabel);
         rootPanel.add(statusBar, BorderLayout.SOUTH);
 
         mainFrame.add(rootPanel);
         mainFrame.setVisible(true);
+
+        btnAddManual.addActionListener(CourseCompassApp::onAddManualAssignment);
+        refreshAssignmentTable();
+    }
+
+    private static void onAddManualAssignment(ActionEvent e) {
+        String name = JOptionPane.showInputDialog("Enter assignment name:");
+        if(name == null || name.isBlank()){
+            statusLabel.setText("Add cancelled or empty name");
+            return;
+        }
+        String course = JOptionPane.showInputDialog("Enter course name:");
+        if(course == null || course.isBlank()){
+            statusLabel.setText("Add cancelled or empty course");
+            return;
+        }
+
+        planner.createManualAssignment(name.trim(), course.trim(), LocalDateTime.now());
+        statusLabel.setText("Manual assignment added");
+        refreshAssignmentTable();
+    }
+
+    private static void refreshAssignmentTable() {
+        assignmentTableModel.setRowCount(0);
+        List<Assignment> allAssignments = planner.getAllAssignments();
+        for(Assignment a : allAssignments){
+            assignmentTableModel.addRow(new Object[]{
+                    a.getId(),
+                    a.getName(),
+                    a.getCourseName(),
+                    a.getDueDate()
+            });
+        }
     }
 }
