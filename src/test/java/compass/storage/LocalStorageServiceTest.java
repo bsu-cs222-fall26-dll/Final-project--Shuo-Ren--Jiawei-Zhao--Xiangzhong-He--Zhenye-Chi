@@ -212,4 +212,33 @@ public class LocalStorageServiceTest {
                 restored.getAssignments().get(0).getName());
     }
 
+    @Test
+    void keepsCurrentDataWhenBackupIsCorrupted() throws IOException {
+        Path file = tempDir.resolve("planner.json");
+        LocalStorageService storage = new LocalStorageService(file);
+
+        AppData first = new AppData(List.of(), Map.of());
+        storage.saveAllData(first);
+
+        AppData current = new AppData(
+                List.of(new Assignment(
+                        1L, "CS222 Project", "CS222", null
+                )),
+                Map.of()
+        );
+        storage.saveAllData(current);
+
+        String currentJson = java.nio.file.Files.readString(file);
+
+        Path backup = tempDir.resolve("planner.json.bak");
+        java.nio.file.Files.writeString(backup, "{ broken json");
+
+        assertThrows(IOException.class, storage::restoreFromBackup);
+
+        assertEquals(
+                currentJson,
+                java.nio.file.Files.readString(file)
+        );
+    }
+
 }
