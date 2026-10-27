@@ -80,4 +80,20 @@ public final class Planner {
             );
         }
     }
+
+    public void setStudyStepCompleted(
+            long assignmentId,
+            long stepId,
+            boolean completed
+    ) {
+        StudyStep step = getStepsForAssignment(assignmentId).stream()
+                .filter(candidate -> candidate.getId() == stepId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Study step not found for assignment "
+                                + assignmentId + ": " + stepId
+                ));
+
+        step.setCompleted(completed);
+    }
 }
