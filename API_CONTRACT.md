@@ -17,8 +17,8 @@ List<Assignment> getAllAssignments();
 /*
 ‑ class CanvasApiService
 */
-List<CanvasCourse> fetchCourses(String token);
-List<CanvasAssignment> fetchAssignmentsForCourses(List<Long> courseIds);
+List<CanvasCourse> fetchCourses();
+List<CanvasAssignment> fetchAssignmentsForCourses(List<CanvasCourse> selectedCourses);
 
 // ========== Zhenye Storage Layer (Task19‑23,28‑29) Package: compass.storage ==========
 /*

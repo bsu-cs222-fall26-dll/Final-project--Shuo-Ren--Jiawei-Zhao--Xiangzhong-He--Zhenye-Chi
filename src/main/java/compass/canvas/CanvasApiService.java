@@ -192,13 +192,20 @@ public final class CanvasApiService {
         return List.copyOf(courses.values());
     }
 
-    private List<JsonElement> getPages(String apiPath)
+    public List<CanvasAssignment> fetchAssignmentsForCourses(
+            List<CanvasCourse> selectedCourses
+    ) throws IOException, InterruptedException {
+        return new CanvasAssignmentReader(this).fetch(selectedCourses);
+    }
+
+    List<JsonElement> getPages(String apiPath)
             throws IOException, InterruptedException {
 
         List<JsonElement> result = new ArrayList<>();
         Set<URI> visited = new HashSet<>();
 
         URI next = createGetRequest(apiPath).uri();
+        URI requested = next;
 
         while (next != null) {
             if (visited.size() >= MAX_PAGES
@@ -210,12 +217,18 @@ public final class CanvasApiService {
 
             requireSameServer(next);
 
+            if (!next.getPath().equals(requested.getPath())) {
+                throw new IOException(
+                        "Canvas pagination changed the requested endpoint."
+                );
+            }
+
             Response response = send(buildRequest(next));
             JsonElement page = parseJson(response.body());
 
             if (!page.isJsonArray()) {
                 throw new IOException(
-                        "Canvas returned an unexpected course list."
+                        "Canvas returned an unexpected list."
                 );
             }
 
