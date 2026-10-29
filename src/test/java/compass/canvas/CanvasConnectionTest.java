@@ -110,6 +110,37 @@ class CanvasConnectionTest {
     }
 
     @Test
+    void connectsWithOneProfileReadAndOneCourseRead() throws Exception {
+        List<String> paths = new ArrayList<>();
+        var result = service(request -> {
+            String path = request.uri().getPath();
+            paths.add(path);
+            return path.endsWith("/self")
+                    ? ok("{\"id\":42,\"name\":\"Student\"}")
+                    : ok("[{\"id\":10,\"name\":\"CS222\"}]");
+        }).connect();
+
+        assertEquals(List.of("/api/v1/users/self", "/api/v1/courses"), paths);
+        assertEquals("Student", result.account().name());
+        assertEquals(1, result.account().courseCount());
+        assertEquals(10, result.courses().get(0).id());
+        assertThrows(UnsupportedOperationException.class, result.courses()::clear);
+    }
+
+    @Test
+    void cancellationDuringTheLastResponseDoesNotReturnResults() {
+        try {
+            var api = service(request -> {
+                Thread.currentThread().interrupt();
+                return ok("[]");
+            });
+            assertThrows(InterruptedException.class, api::fetchCourses);
+        } finally {
+            Thread.interrupted(); // Do not leave JUnit's worker interrupted.
+        }
+    }
+
+    @Test
     void recognizesConcludedFlagAndCompletedWorkflow()
             throws Exception {
 

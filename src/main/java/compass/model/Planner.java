@@ -42,6 +42,28 @@ public final class Planner {
                 .toList();
     }
 
+    /** Updates a Canvas assignment without replacing its local ID or study steps. */
+    public Assignment importCanvasAssignment(
+            String name, String courseName, LocalDateTime dueDate,
+            long canvasAssignmentId
+    ) {
+        if (canvasAssignmentId <= 0) {
+            throw new IllegalArgumentException("Canvas assignment ID must be positive.");
+        }
+        Assignment existing = assignments.values().stream()
+                .filter(item -> item.getSource() == AssignmentSource.CANVAS
+                        && Long.valueOf(canvasAssignmentId).equals(item.getCanvasAssignmentId()))
+                .findFirst().orElse(null);
+        long localId = existing == null ? nextAssignmentId : existing.getId();
+        Assignment imported = new Assignment(localId, name, courseName, dueDate,
+                AssignmentSource.CANVAS, canvasAssignmentId);
+        assignments.put(localId, imported);
+        if (existing == null) {
+            nextAssignmentId++;
+        }
+        return imported;
+    }
+
     public StudyStep addStudyStep(long assignmentId, String text) {
         if (!assignments.containsKey(assignmentId)) {
             throw new IllegalArgumentException(

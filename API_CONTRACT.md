@@ -17,6 +17,7 @@ List<Assignment> getAllAssignments();
 /*
 ‑ class CanvasApiService
 */
+CanvasApiService.ConnectionData connect(); // account() and immutable courses()
 List<CanvasCourse> fetchCourses();
 List<CanvasAssignment> fetchAssignmentsForCourses(List<CanvasCourse> selectedCourses);
 
@@ -120,5 +121,25 @@ No code coverage percentage has been measured.
 - Xiangzhong: connect UI actions to the Planner methods above.
 - Shuo: map Canvas data to Assignment while preserving the Canvas assignment ID and nullable due date.
 - Zhenye: coordinate persistence and restoration of IDs, sources, dates, steps, and completion states.
-- Planner currently manages in-memory data. Canvas import and saved-state loading entry points still require team agreement.
+- Planner currently manages in-memory data. Saved-state loading still requires integration.
 - When restoration is integrated, ID counters must avoid collisions with restored assignment and step IDs.
+
+### Session-only UI / Canvas integration on Shuo's branch
+
+```java
+Assignment importCanvasAssignment(
+        String name, String courseName, LocalDateTime dueDate,
+        long canvasAssignmentId);
+```
+
+- New Canvas records receive a local ID separate from the remote Canvas ID.
+- Re-importing the same remote ID updates metadata and preserves study steps.
+- CourseCompassApp now exposes only a basic Canvas viewer: URL/token entry,
+  account connection, one course selection, and assignment display. Network
+  calls use a background SwingWorker. It does not call Planner import or save.
+- The model, study-step and import APIs remain available for later integration.
+- Persistence is not connected on this branch.
+- Four additional model tests cover the new import entry point.
+- The UI calls CanvasApiService.connect() once to obtain account() and courses().
+  checkConnection() remains available for existing callers. See
+  docs/CANVAS_VERIFICATION.md for automated and real-school check results.

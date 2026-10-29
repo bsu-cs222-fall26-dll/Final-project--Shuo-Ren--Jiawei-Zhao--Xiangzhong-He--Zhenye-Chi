@@ -29,6 +29,12 @@ public final class CanvasApiService {
             int courseCount
     ) { }
 
+    public record ConnectionData(ConnectionCheck account, List<CanvasCourse> courses) {
+        public ConnectionData {
+            courses = List.copyOf(courses);
+        }
+    }
+
     @FunctionalInterface
     interface Transport {
         Response send(HttpRequest request)
@@ -111,6 +117,11 @@ public final class CanvasApiService {
 
     public ConnectionCheck checkConnection()
             throws IOException, InterruptedException {
+        return connect().account();
+    }
+
+    /** Reads the profile and courses once for the connection screen. */
+    public ConnectionData connect() throws IOException, InterruptedException {
 
         JsonElement profile = parseJson(
                 send(createGetRequest("api/v1/users/self")).body()
@@ -130,11 +141,8 @@ public final class CanvasApiService {
                 "Canvas user"
         );
 
-        return new ConnectionCheck(
-                name,
-                id,
-                fetchCourses().size()
-        );
+        List<CanvasCourse> courses = fetchCourses();
+        return new ConnectionData(new ConnectionCheck(name, id, courses.size()), courses);
     }
 
     public List<CanvasCourse> fetchCourses()
@@ -260,6 +268,10 @@ public final class CanvasApiService {
             throw new IOException(
                     "Could not connect to Canvas. Check the network and school URL."
             );
+        }
+
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException("Canvas request cancelled.");
         }
 
         switch (response.statusCode()) {
