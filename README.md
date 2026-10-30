@@ -1,39 +1,24 @@
 # Course Compass
 
-A Java desktop project for organizing Canvas coursework.
+A Java desktop application for viewing Canvas coursework and organizing assignment study steps.
 
-Team: Shuo Ren, Jiawei Zhao, Zhenye Chi, Xiangzhong He.
+**Team:** Shuo Ren, Jiawei Zhao, Zhenye Chi, Xiangzhong He.
 
-## Current branch
+## Current Version
 
-The Swing interface is a basic read-only Canvas viewer. Enter your school's
-HTTPS Canvas URL and your own token, connect, choose a course, and load its
-assignments. The viewer displays deadlines and points; it does not save data
-or modify Canvas. Tokens are kept in memory, never in project files.
+The main branch includes Canvas account connection, course selection, and assignment display with deadlines and points.
 
-The model separately supports manual assignments and study steps, plus
-Canvas re-import while retaining local progress. Full model/storage/UI
-integration is still in progress. See [verification notes](docs/CANVAS_VERIFICATION.md).
+The viewer is read-only and does not save assignments or modify Canvas. The model supports manual assignments and study steps; storage and study-step interface integration are separate work.
 
-## Build and run
+## Build and Run
 
-Use JDK 21. The project currently targets Java 17 bytecode and includes
-the Gradle Wrapper.
-
-Windows PowerShell, from the repository directory:
+Use JDK 21. The project includes the Gradle Wrapper and targets Java 17 bytecode.
 
 ```powershell
 .\gradlew.bat test installDist
 .\gradlew.bat run
 ```
 
-The generated Windows launcher is
-`build/install/CourseCompass/bin/CourseCompass.bat`.
+Application entry point: `compass.CourseCompassApp`.
 
-In IntelliJ, open this directory as a Gradle project and run
-`compass.CourseCompassApp.main()`. `src/main` is the production source
-directory; a class named `Main` is not required.
-
-Unit tests use synthetic responses and do not need a Canvas token.
-Real-account checks are documented separately from automated tests and
-outside-user acceptance testing.
+Never commit Canvas access tokens.
