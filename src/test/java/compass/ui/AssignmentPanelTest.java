@@ -49,6 +49,10 @@ class AssignmentPanelTest {
         assertEquals(1, onEdt(() -> { search.setText("[Lab]"); return table.getRowCount(); }));
     }
 
+    @Test void clearingTheSearchRestoresAllAssignments() throws Exception {
+        assertEquals(3, onEdt(() -> { search.setText("English"); search.setText(""); return table.getRowCount(); }));
+    }
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
