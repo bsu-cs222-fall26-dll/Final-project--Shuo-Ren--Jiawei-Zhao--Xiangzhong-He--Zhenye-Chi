@@ -70,6 +70,13 @@ public final class AssignmentPanel extends JPanel {
         controls.add(result);
         return controls;
     }
+    private void filter() {
+        String query = search.getText().trim();
+        sorter.setRowFilter(query.isEmpty() ? null : RowFilter.regexFilter("(?iu)" + Pattern.quote(query), 0, 1));
+        count.setText("Showing " + table.getRowCount() + " of " + model.getRowCount());
+        selectionChanged();
+    }
+
     private void selectionChanged() {
         score.setText("");
         int row = selectedModelRow();
