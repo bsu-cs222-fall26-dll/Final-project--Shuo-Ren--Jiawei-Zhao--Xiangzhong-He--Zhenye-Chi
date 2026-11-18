@@ -86,6 +86,14 @@ class AssignmentPanelTest {
     }
 
 
+    @Test void filteringOutTheSelectionDisablesCalculation() throws Exception {
+        assertFalse(onEdt(() -> {
+            table.setRowSelectionInterval(0, 0); search.setText("not found");
+            return calculate.isEnabled();
+        }));
+    }
+
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
