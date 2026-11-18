@@ -41,6 +41,11 @@ class AssignmentPanelTest {
         assertEquals(2, onEdt(() -> { search.setText("cs222"); return table.getRowCount(); }));
     }
 
+    @Test void searchesAssignmentNamesIgnoringCase() throws Exception {
+        assertEquals("Essay", onEdt(() -> { search.setText("ESS"); return table.getValueAt(0, 1); }));
+    }
+
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
