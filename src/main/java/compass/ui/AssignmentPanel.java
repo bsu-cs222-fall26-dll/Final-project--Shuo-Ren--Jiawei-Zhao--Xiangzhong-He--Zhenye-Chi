@@ -89,6 +89,23 @@ public final class AssignmentPanel extends JPanel {
         result.setText(row < 0 ? "Select an assignment to try a what-if score."
                 : usable ? "Enter an expected score, then Calculate." : "This assignment has no positive points possible.");
     }
+    private void calculate() {
+        int row = selectedModelRow();
+        if (row < 0 || !calculate.isEnabled()) return;
+        try {
+            BigDecimal earned = new BigDecimal(score.getText().trim());
+            BigDecimal points = (BigDecimal) model.getValueAt(row, 3);
+            BigDecimal percentage = WhatIfScoreCalculator.percentage(earned, points);
+            result.setText("What-if: " + earned.stripTrailingZeros().toPlainString() + " / "
+                    + points.stripTrailingZeros().toPlainString() + " = "
+                    + percentage.stripTrailingZeros().toPlainString() + "%");
+        } catch (NumberFormatException exception) {
+            result.setText("Enter a valid numeric score.");
+        } catch (IllegalArgumentException exception) {
+            result.setText(exception.getMessage());
+        }
+    }
+
 
     private int selectedModelRow() {
         int row = table.getSelectedRow();
