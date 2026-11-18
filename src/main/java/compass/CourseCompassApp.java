@@ -120,15 +120,7 @@ public final class CourseCompassApp {
     }
 
     private void displayAssignments(List<CanvasAssignment> assignments) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        tableModel.setRowCount(0);
-        for (CanvasAssignment item : assignments) {
-            tableModel.addRow(new Object[]{
-                    item.courseName(), item.name(),
-                    item.dueDate() == null ? "No deadline" : format.format(item.dueDate()),
-                    item.pointsPossible()
-            });
-        }
+        assignmentPanel.setAssignments(assignments);
         status.setText("Loaded " + assignments.size() + " assignments. Display only; not saved.");
     }
 
