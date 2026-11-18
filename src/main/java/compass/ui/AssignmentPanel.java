@@ -52,7 +52,16 @@ public final class AssignmentPanel extends JPanel {
         controls.add(count);
         return controls;
     }
-
+    public void setAssignments(List<CanvasAssignment> assignments) {
+        table.clearSelection();
+        model.setRowCount(0);
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        for (CanvasAssignment item : assignments) {
+            model.addRow(new Object[]{item.courseName(), item.name(),
+                    item.dueDate() == null ? "No deadline" : format.format(item.dueDate()), item.pointsPossible()});
+        }
+        filter();
+    }
     private JPanel scoreControls() {
         JPanel summary = new JPanel(new BorderLayout(5, 0));
         summary.add(selected, BorderLayout.CENTER);
