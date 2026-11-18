@@ -45,6 +45,9 @@ class AssignmentPanelTest {
         assertEquals("Essay", onEdt(() -> { search.setText("ESS"); return table.getValueAt(0, 1); }));
     }
 
+    @Test void treatsSearchAsLiteralTextRatherThanARegularExpression() throws Exception {
+        assertEquals(1, onEdt(() -> { search.setText("[Lab]"); return table.getRowCount(); }));
+    }
 
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
