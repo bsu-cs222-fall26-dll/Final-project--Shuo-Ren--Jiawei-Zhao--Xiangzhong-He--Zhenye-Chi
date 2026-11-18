@@ -74,6 +74,18 @@ class AssignmentPanelTest {
         }));
     }
 
+    @Test void nonNumericInputShowsAnInlineMessage() throws Exception {
+        assertEquals("Enter a valid numeric score.", onEdt(() -> {
+            table.setRowSelectionInterval(0, 0); score.setText("hello"); calculate.doClick();
+            return result.getText();
+        }));
+    }
+
+    @Test void zeroPossiblePointsDisableCalculation() throws Exception {
+        assertFalse(onEdt(() -> { table.setRowSelectionInterval(2, 2); return calculate.isEnabled(); }));
+    }
+
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
