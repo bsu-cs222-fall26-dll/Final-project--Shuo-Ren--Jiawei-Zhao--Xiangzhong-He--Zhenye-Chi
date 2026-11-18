@@ -52,6 +52,28 @@ public final class AssignmentPanel extends JPanel {
         controls.add(count);
         return controls;
     }
+    public AssignmentPanel() {
+        super(new BorderLayout(5, 5));
+        search.setName("assignmentSearch"); score.setName("whatIfScore");
+        calculate.setName("calculateWhatIf"); result.setName("whatIfResult");
+        table.setName("assignmentTable");
+        table.setRowSorter(sorter);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setFillsViewportHeight(true);
+        table.setRowHeight(24);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) selectionChanged();
+        });
+        onTextChange(search, this::filter);
+        onTextChange(score, () -> result.setText("Enter an expected score, then Calculate."));
+        calculate.addActionListener(event -> calculate());
+        score.addActionListener(event -> calculate());
+        add(searchControls(), BorderLayout.NORTH);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+        add(scoreControls(), BorderLayout.SOUTH);
+        setAssignments(List.of());
+    }
     public void setAssignments(List<CanvasAssignment> assignments) {
         table.clearSelection();
         model.setRowCount(0);
