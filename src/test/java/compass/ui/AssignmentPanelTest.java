@@ -116,6 +116,13 @@ class AssignmentPanelTest {
         }));
     }
 
+    @Test void loadingAnotherCourseClearsThePreviousSelection() throws Exception {
+        assertEquals(-1, onEdt(() -> {
+            table.setRowSelectionInterval(0, 0); panel.setAssignments(List.of(item(4, "New", "CS120", "20")));
+            return table.getSelectedRow();
+        }));
+    }
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
