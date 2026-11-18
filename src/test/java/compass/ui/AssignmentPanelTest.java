@@ -74,6 +74,14 @@ class AssignmentPanelTest {
         }));
     }
 
+    @Test void switchingAssignmentsClearsThePreviousCalculation() throws Exception {
+        assertEquals("Enter an expected score, then Calculate.", onEdt(() -> {
+            table.setRowSelectionInterval(0, 0); score.setText("85"); calculate.doClick();
+            table.setRowSelectionInterval(1, 1);
+            return result.getText();
+        }));
+    }
+
     @Test void nonNumericInputShowsAnInlineMessage() throws Exception {
         assertEquals("Enter a valid numeric score.", onEdt(() -> {
             table.setRowSelectionInterval(0, 0); score.setText("hello"); calculate.doClick();
