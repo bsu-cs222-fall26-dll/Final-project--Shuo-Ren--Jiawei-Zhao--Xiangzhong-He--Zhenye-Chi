@@ -109,6 +109,13 @@ class AssignmentPanelTest {
     }
 
 
+    @Test void calculatingDoesNotChangeTheCanvasPointsDisplayed() throws Exception {
+        assertEquals(new BigDecimal("100"), onEdt(() -> {
+            table.setRowSelectionInterval(0, 0); score.setText("85"); calculate.doClick();
+            return table.getValueAt(0, 3);
+        }));
+    }
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
