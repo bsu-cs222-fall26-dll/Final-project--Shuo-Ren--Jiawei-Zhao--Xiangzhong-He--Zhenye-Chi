@@ -57,6 +57,15 @@ class AssignmentPanelTest {
         assertEquals(0, onEdt(() -> { search.setText("not found"); return table.getRowCount(); }));
     }
 
+    @Test void aFilteredRowUsesItsOwnPossiblePoints() throws Exception {
+        assertEquals("What-if: 40 / 50 = 80%", onEdt(() -> {
+            search.setText("Setup"); table.setRowSelectionInterval(0, 0);
+            score.setText("40"); calculate.doClick();
+            return result.getText();
+        }));
+    }
+
+
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
     }
