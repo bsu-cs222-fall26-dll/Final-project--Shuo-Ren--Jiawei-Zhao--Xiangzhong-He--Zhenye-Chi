@@ -9,10 +9,10 @@ import compass.ui.AssignmentPanel;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -28,12 +28,7 @@ public final class CourseCompassApp {
     private final JComboBox<String> courseBox = new JComboBox<>();
     private final JButton loadButton = new JButton("Load assignments");
     private final JLabel status = new JLabel("Enter your Canvas URL and token, then click Connect.");
-    private final DefaultTableModel tableModel = new DefaultTableModel(
-            new String[]{"Course", "Assignment", "Due date", "Points"}, 0) {
-        @Override public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
+
     private final AssignmentPanel assignmentPanel = new AssignmentPanel();
     private List<CanvasCourse> courses = List.of();
     private CanvasApiService service;
