@@ -71,7 +71,10 @@ public final class CourseCompassApp {
 
         connectButton.addActionListener(event -> connect());
         loadButton.addActionListener(event -> loadAssignments());
-        courseBox.addActionListener(event -> updateControls());
+        courseBox.addActionListener(event -> {
+            assignmentPanel.setAssignments(List.of());
+            updateControls();
+        });
         listen(urlField, this::credentialsChanged);
         listen(tokenField, this::credentialsChanged);
         updateControls();
