@@ -65,6 +65,14 @@ class AssignmentPanelTest {
         }));
     }
 
+    @Test void aSortedRowUsesItsOwnPossiblePoints() throws Exception {
+        assertEquals("What-if: 40 / 50 = 80%", onEdt(() -> {
+            table.getRowSorter().setSortKeys(List.of(new RowSorter.SortKey(3, SortOrder.ASCENDING)));
+            table.setRowSelectionInterval(1, 1);
+            score.setText("40"); calculate.doClick();
+            return result.getText();
+        }));
+    }
 
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
