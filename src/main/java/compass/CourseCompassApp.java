@@ -99,7 +99,7 @@ public final class CourseCompassApp {
                 for (CanvasCourse course : courses) {
                     courseBox.addItem(course.name() + " (" + course.term() + ")");
                 }
-                tableModel.setRowCount(0);
+                assignmentPanel.setAssignments(List.of());
                 status.setText("Connected: " + data.account().name()
                         + " / ID " + data.account().userId()
                         + " / " + courses.size() + " courses. Choose a course.");
