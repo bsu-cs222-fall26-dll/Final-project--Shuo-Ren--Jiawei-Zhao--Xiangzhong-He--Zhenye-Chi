@@ -22,6 +22,24 @@ class AssignmentPanelTest {
     private JTextField score;
     private JButton calculate;
     private JLabel result;
+    @BeforeEach
+    void loadAssignmentsOnTheSwingThread() throws Exception {
+        onEdt(() -> {
+            panel = new AssignmentPanel();
+            panel.setAssignments(List.of(item(1, "Essay", "English", "100"),
+                    item(2, "[Lab] Setup", "CS222", "50"), item(3, "Practice", "CS222", "0")));
+            table = (JTable) named(panel, "assignmentTable");
+            search = (JTextField) named(panel, "assignmentSearch");
+            score = (JTextField) named(panel, "whatIfScore");
+            calculate = (JButton) named(panel, "calculateWhatIf");
+            result = (JLabel) named(panel, "whatIfResult");
+            return null;
+        });
+    }
+
+    @Test void searchesCourseNamesIgnoringCase() throws Exception {
+        assertEquals(2, onEdt(() -> { search.setText("cs222"); return table.getRowCount(); }));
+    }
 
     private CanvasAssignment item(long id, String name, String course, String points) {
         return new CanvasAssignment(id, id, name, course, null, new BigDecimal(points));
