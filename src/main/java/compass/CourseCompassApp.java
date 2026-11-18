@@ -66,11 +66,7 @@ public final class CourseCompassApp {
         top.add(selection, BorderLayout.SOUTH);
         root.add(top, BorderLayout.NORTH);
 
-        JTable table = new JTable(tableModel);
-        table.setFillsViewportHeight(true);
-        table.setRowHeight(24);
-        table.getTableHeader().setReorderingAllowed(false);
-        root.add(new JScrollPane(table), BorderLayout.CENTER);
+        root.add(assignmentPanel, BorderLayout.CENTER);
         root.add(status, BorderLayout.SOUTH);
 
         connectButton.addActionListener(event -> connect());
