@@ -118,6 +118,7 @@ public final class CourseCompassApp {
         if (service == null || index < 0 || index >= courses.size()) return;
         CanvasCourse course = courses.get(index);
         CanvasApiService connected = service;
+        assignmentPanel.setAssignments(List.of());
         runRequest("Reading assignments...", () ->
                 connected.fetchAssignmentsForCourses(List.of(course)), this::displayAssignments);
     }
