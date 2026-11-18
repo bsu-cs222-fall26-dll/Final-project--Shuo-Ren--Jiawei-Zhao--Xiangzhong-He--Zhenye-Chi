@@ -8,6 +8,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.math.BigDecimal;
+import compass.canvas.CanvasAssignment;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /** Search and score simulation for the assignments currently loaded from Canvas. */
 public final class AssignmentPanel extends JPanel {
@@ -22,30 +28,66 @@ public final class AssignmentPanel extends JPanel {
     private final DefaultTableModel model = new DefaultTableModel(
             new String[]{"Course", "Assignment", "Due date", "Points"}, 0) {
         private static final long serialVersionUID = 1L;
-        @Override public boolean isCellEditable(int row, int column) { return false; }
-        @Override public Class<?> getColumnClass(int column) { return column == 3 ? BigDecimal.class : String.class; }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return column == 3 ? BigDecimal.class : String.class;
+        }
     };
     private final JTable table = new JTable(model);
     // The row filter is runtime UI state, matching JTable's transient sorter.
     private final transient TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+
     private JPanel searchControls() {
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         JLabel label = new JLabel("Search course or assignment:");
         label.setLabelFor(search);
-        controls.add(label); controls.add(search); controls.add(count);
-        return controls;
-    }
-    private JPanel scoreControls() {
-        JPanel summary = new JPanel(new BorderLayout(5, 0));
-        summary.add(selected, BorderLayout.CENTER); summary.add(possible, BorderLayout.EAST);
-        JPanel input = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        JLabel label = new JLabel("What-if score:");
-        label.setLabelFor(score);
-        input.add(label); input.add(score); input.add(calculate);
-        input.add(new JLabel("Assignment percentage only"));
-        JPanel controls = new JPanel(new GridLayout(3, 1, 0, 4));
-        controls.add(summary); controls.add(input); controls.add(result);
+        controls.add(label);
+        controls.add(search);
+        controls.add(count);
         return controls;
     }
 
+    private JPanel scoreControls() {
+        JPanel summary = new JPanel(new BorderLayout(5, 0));
+        summary.add(selected, BorderLayout.CENTER);
+        summary.add(possible, BorderLayout.EAST);
+        JPanel input = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        JLabel label = new JLabel("What-if score:");
+        label.setLabelFor(score);
+        input.add(label);
+        input.add(score);
+        input.add(calculate);
+        input.add(new JLabel("Assignment percentage only"));
+        JPanel controls = new JPanel(new GridLayout(3, 1, 0, 4));
+        controls.add(summary);
+        controls.add(input);
+        controls.add(result);
+        return controls;
+    }
+
+
+    private static void onTextChange(JTextField field, Runnable action) {
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                action.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                action.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                action.run();
+            }
+        });
+    }
 }
