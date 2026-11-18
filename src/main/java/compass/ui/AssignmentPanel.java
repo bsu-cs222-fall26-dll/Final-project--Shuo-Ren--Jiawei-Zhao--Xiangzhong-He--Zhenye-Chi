@@ -70,7 +70,18 @@ public final class AssignmentPanel extends JPanel {
         controls.add(result);
         return controls;
     }
-
+    private void selectionChanged() {
+        score.setText("");
+        int row = selectedModelRow();
+        selected.setText(row < 0 ? "Selected: none" : "Selected: " + model.getValueAt(row, 1));
+        selected.setToolTipText(selected.getText());
+        BigDecimal points = row < 0 ? null : (BigDecimal) model.getValueAt(row, 3);
+        possible.setText(points == null ? "Max points: --" : "Max points: " + points.toPlainString());
+        boolean usable = points != null && points.signum() > 0;
+        score.setEnabled(usable); calculate.setEnabled(usable);
+        result.setText(row < 0 ? "Select an assignment to try a what-if score."
+                : usable ? "Enter an expected score, then Calculate." : "This assignment has no positive points possible.");
+    }
 
     private int selectedModelRow() {
         int row = table.getSelectedRow();
