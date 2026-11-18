@@ -72,6 +72,11 @@ public final class AssignmentPanel extends JPanel {
     }
 
 
+    private int selectedModelRow() {
+        int row = table.getSelectedRow();
+        return row < 0 ? -1 : table.convertRowIndexToModel(row);
+    }
+
     private static void onTextChange(JTextField field, Runnable action) {
         field.getDocument().addDocumentListener(new DocumentListener() {
             @Override
