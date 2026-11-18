@@ -3,6 +3,8 @@ package compass;
 import compass.canvas.CanvasApiService;
 import compass.canvas.CanvasAssignment;
 import compass.canvas.CanvasCourse;
+import compass.ui.AssignmentPanel;
+
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -32,6 +34,7 @@ public final class CourseCompassApp {
             return false;
         }
     };
+    private final AssignmentPanel assignmentPanel = new AssignmentPanel();
     private List<CanvasCourse> courses = List.of();
     private CanvasApiService service;
     private SwingWorker<?, ?> worker;
